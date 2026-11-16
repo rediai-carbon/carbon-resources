@@ -3,6 +3,7 @@
 #include "UnpackBundleCliOperation.h"
 
 #include <iostream>
+#include <limits>
 #include <argparse/argparse.hpp>
 
 UnpackBundleCliOperation::UnpackBundleCliOperation() :

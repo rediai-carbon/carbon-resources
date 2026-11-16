@@ -7,6 +7,9 @@
 #include <BundleStreamOut.h>
 #include <BundleStreamIn.h>
 #include <filesystem>
+#if defined(__linux__)
+#include <sys/stat.h>
+#endif
 
 #include <gtest/gtest.h>
 
@@ -1014,6 +1017,17 @@ TEST_F( ResourceToolsTest, CalculateBinaryOperationMacOS )
 	std::filesystem::path textFilePath = testDataPath / "ResourcesOnBranch" / "introMovie.txt";
 	std::filesystem::path nonexistantFilePath = testDataPath / "ResourcesOnBranch" / "thisFileDoesNotExist.txt";
 	ASSERT_EQ( 33188, ResourceTools::CalculateBinaryOperation( textFilePath ) );
+	ASSERT_EQ( 0, ResourceTools::CalculateBinaryOperation( nonexistantFilePath ) );
+}
+#elif defined(__linux__)
+TEST_F( ResourceToolsTest, CalculateBinaryOperationLinux )
+{
+	std::filesystem::path testDataPath = TEST_DATA_BASE_PATH;
+	std::filesystem::path textFilePath = testDataPath / "ResourcesOnBranch" / "introMovie.txt";
+	std::filesystem::path nonexistantFilePath = testDataPath / "ResourcesOnBranch" / "thisFileDoesNotExist.txt";
+	struct stat fileStatus;
+	ASSERT_EQ( 0, lstat( textFilePath.c_str(), &fileStatus ) );
+	ASSERT_EQ( fileStatus.st_mode, ResourceTools::CalculateBinaryOperation( textFilePath ) );
 	ASSERT_EQ( 0, ResourceTools::CalculateBinaryOperation( nonexistantFilePath ) );
 }
 #elif WIN32

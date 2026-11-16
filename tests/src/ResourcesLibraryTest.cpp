@@ -1339,10 +1339,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectory )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 }
 
 TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectoryWithStreaming )
@@ -1375,10 +1381,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectoryWithStreaming )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 }
 
 TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectoryExportResources )
@@ -1413,10 +1425,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectoryExportResources )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 
     EXPECT_TRUE( DirectoryIsSubset( createResourceGroupParams.exportResourcesDestinationSettings.basePath, createResourceGroupParams.directory ) );
 }
@@ -1451,10 +1469,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectorySkipCompression )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupSkipCompressionWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupSkipCompressionMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupSkipCompressionMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 }
 
 TEST_F( ResourcesLibraryTest, CreateResourceGroupFromDirectoryOutputPathIsInvalid )
@@ -2044,10 +2068,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromFilter )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 }
 
 TEST_F( ResourcesLibraryTest, CreateResourceGroupFromFilterExportResources )
@@ -2092,10 +2122,16 @@ TEST_F( ResourcesLibraryTest, CreateResourceGroupFromFilterExportResources )
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupWindows.yaml" );
 #elif __APPLE__
 	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
+#elif defined(__linux__)
+	std::filesystem::path goldFile = GetTestFileAbsolutePath( "CreateResourceFiles/ResourceGroupMacOS.yaml" );
 #else
 #error Unsupported platform
 #endif
+#if defined(__linux__)
+	EXPECT_TRUE( ResourceGroupContentMatches( exportParams.filename, goldFile ) );
+#else
 	EXPECT_TRUE( FilesMatch( goldFile, exportParams.filename ) );
+#endif
 
 	EXPECT_TRUE( DirectoryIsSubset( params.exportSettings.destinationSettings.basePath, params.filterSettings.prefixMapBasePath ) );
 }

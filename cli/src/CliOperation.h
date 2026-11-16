@@ -4,6 +4,7 @@
 #ifndef CliOperation_H
 #define CliOperation_H
 
+#include <cstdint>
 #include <string>
 
 #include <Enums.h>

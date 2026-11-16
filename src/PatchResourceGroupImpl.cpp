@@ -2,6 +2,8 @@
 
 #include "PatchResourceGroupImpl.h"
 
+#include "ExistingPath.h"
+
 #include "Patching.h"
 
 #include "BundleResourceGroupImpl.h"
@@ -759,7 +761,7 @@ Result PatchResourceGroup::PatchResourceGroupImpl::Apply( PatchApplyParams& para
         int i = 0;
 		for( const auto& path : *m_removedResources.GetValue() )
 		{
-			auto toRemove = std::filesystem::absolute( params.resourcesToPatchDestinationSettings.basePath / path );
+			auto toRemove = std::filesystem::absolute( PreferExistingPathCase( params.resourcesToPatchDestinationSettings.basePath / path ) );
 
             if (removingFilesStatusSettings.RequiresStatusUpdates())
             {

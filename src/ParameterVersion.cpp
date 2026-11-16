@@ -2,6 +2,7 @@
 
 #include "ParameterVersion.h"
 
+#include <limits>
 #include <map>
 
 namespace CarbonResources

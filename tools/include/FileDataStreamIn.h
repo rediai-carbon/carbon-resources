@@ -4,6 +4,7 @@
 #ifndef FileDataStreamIn_H
 #define FileDataStreamIn_H
 
+#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <fstream>

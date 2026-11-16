@@ -6,6 +6,7 @@
 
 #include "FilterFileReader.h"
 
+#include <cstdint>
 #include <filesystem>
 #include <vector>
 #include <map>
