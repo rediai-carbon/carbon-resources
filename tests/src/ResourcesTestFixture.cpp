@@ -138,7 +138,12 @@ namespace
 {
 std::filesystem::path OpenablePath( const std::filesystem::path& requested )
 {
-	const auto resolved = PreferExistingPathCase( requested, requested.parent_path() );
+	if( requested.empty() || std::filesystem::exists( requested ) )
+	{
+		return requested;
+	}
+	const auto absolute = std::filesystem::absolute( requested );
+	const auto resolved = PreferExistingPathCase( absolute, absolute.parent_path() );
 	return resolved ? *resolved : requested;
 }
 }

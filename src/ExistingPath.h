@@ -25,12 +25,13 @@ inline std::optional<std::filesystem::path> PreferExistingPathCase( const std::f
 	{
 		return std::nullopt;
 	}
-
-	fs::path relative = requested.lexically_normal();
-	if( relative.is_absolute() )
+	const fs::path canonicalRequest = fs::weakly_canonical( requested, ec );
+	if( ec )
 	{
-		relative = relative.lexically_relative( root );
+		return std::nullopt;
 	}
+
+	fs::path relative = canonicalRequest.lexically_relative( root );
 	if( relative.empty() )
 	{
 		return std::nullopt;
