@@ -2,6 +2,7 @@
 
 #include "CreateBundleCliOperation.h"
 
+#include <limits>
 #include <string>
 
 #include <argparse/argparse.hpp>

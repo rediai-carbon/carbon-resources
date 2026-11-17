@@ -6,6 +6,7 @@
 
 #include "Exports.h"
 #include "Enums.h"
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <filesystem>

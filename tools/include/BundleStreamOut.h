@@ -8,7 +8,9 @@
 #include <FileDataStreamOut.h>
 #include <ScopedFile.h>
 #include <Md5ChecksumStream.h>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 #include "GzipCompressionStream.h"
 

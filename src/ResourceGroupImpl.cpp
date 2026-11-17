@@ -12,6 +12,7 @@
 #include <GzipCompressionStream.h>
 #include <cctype>
 #include <algorithm>
+#include <limits>
 
 #include "ResourceInfo/PatchResourceGroupInfo.h"
 #include "ResourceInfo/BundleResourceGroupInfo.h"

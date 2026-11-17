@@ -4,6 +4,7 @@
 #ifndef BundleStreamIn_H
 #define BundleStreamIn_H
 
+#include <cstdint>
 #include <string>
 
 namespace ResourceTools

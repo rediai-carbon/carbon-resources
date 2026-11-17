@@ -5,11 +5,13 @@
 #include "BundleStreamOut.h"
 
 #include <sstream>
-#if __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
 #include <sys/stat.h> // for lstat
 #endif
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 
 #include <curl/curl.h>
 #include <zlib.h>
@@ -425,7 +427,7 @@ bool SaveFile( const std::filesystem::path& path, const std::string& data )
 	}
 }
 
-#if __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
 unsigned int CalculateBinaryOperation( const std::filesystem::path& path )
 {
 	struct stat s;

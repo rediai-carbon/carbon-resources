@@ -1,6 +1,7 @@
 // Copyright © 2025 CCP ehf.
 
 #include "ResourceInfo.h"
+#include "../ExistingPath.h"
 
 #include "Md5ChecksumStream.h"
 
@@ -260,6 +261,13 @@ Result ResourceInfo::GetDestinationPath( const ResourceDestinationSettings& dest
 	default:
 		return Result{ ResultType::FAIL };
 	}
+
+	const auto resolved = PreferExistingPathCase( path, destinationSettings.basePath );
+	if( !resolved )
+	{
+		return Result{ ResultType::FAIL };
+	}
+	path = *resolved;
 
 	return Result{ ResultType::SUCCESS };
 }

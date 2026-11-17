@@ -2,6 +2,8 @@
 
 #include "PatchResourceGroupImpl.h"
 
+#include "ExistingPath.h"
+
 #include "Patching.h"
 
 #include "BundleResourceGroupImpl.h"
@@ -759,7 +761,15 @@ Result PatchResourceGroup::PatchResourceGroupImpl::Apply( PatchApplyParams& para
         int i = 0;
 		for( const auto& path : *m_removedResources.GetValue() )
 		{
-			auto toRemove = std::filesystem::absolute( params.resourcesToPatchDestinationSettings.basePath / path );
+			const auto resolved = PreferExistingPathCase( params.resourcesToPatchDestinationSettings.basePath / path, params.resourcesToPatchDestinationSettings.basePath );
+			params.resourcesToRemove.push_back( path );
+			if( !resolved )
+			{
+				statusSettings.Update( StatusProgressType::WARNING, 0, 0, "Refused to remove a path outside the destination." );
+				continue;
+			}
+			auto toRemove = std::filesystem::absolute( *resolved );
+			std::error_code ec;
 
             if (removingFilesStatusSettings.RequiresStatusUpdates())
             {
@@ -768,9 +778,6 @@ Result PatchResourceGroup::PatchResourceGroupImpl::Apply( PatchApplyParams& para
 				removingFilesStatusSettings.Update( StatusProgressType::PERCENTAGE, percentage, step, toRemove.u8string() );
             }
 
-            params.resourcesToRemove.push_back( path );
-
-			std::error_code ec;
 			if( std::filesystem::exists( toRemove ) )
 			{
 				bool removed = std::filesystem::remove( toRemove, ec );
@@ -780,9 +787,11 @@ Result PatchResourceGroup::PatchResourceGroupImpl::Apply( PatchApplyParams& para
 				}
 			}
 
-			// Remove any empty directories left over
+			// Remove empty directories left inside the destination, and stop at its root.
+			ec.clear();
+			const auto destinationRoot = std::filesystem::weakly_canonical( params.resourcesToPatchDestinationSettings.basePath, ec );
 			toRemove = toRemove.parent_path();
-			while( std::filesystem::is_directory( toRemove ) && std::filesystem::is_empty( toRemove ) )
+			while( std::filesystem::is_directory( toRemove ) && std::filesystem::is_empty( toRemove ) && std::filesystem::weakly_canonical( toRemove, ec ) != destinationRoot )
 			{
 				bool removed = std::filesystem::remove( toRemove, ec );
 				if( !removed )

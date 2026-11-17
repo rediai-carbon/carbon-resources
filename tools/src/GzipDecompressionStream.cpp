@@ -3,6 +3,7 @@
 #include "GzipDecompressionStream.h"
 
 #include <algorithm>
+#include <limits>
 
 constexpr int CHUNK = 16384; // 16kb
 

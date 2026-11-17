@@ -4,6 +4,7 @@
 #ifndef GzipCompressionStream_H
 #define GzipCompressionStream_H
 
+#include <cstdint>
 #include <string>
 #include <zlib.h>
 

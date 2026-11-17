@@ -2,6 +2,8 @@
 
 #include "Patching.h"
 
+#include <cstring>
+
 #include <bsdiff.h>
 #include <bspatch.h>
 

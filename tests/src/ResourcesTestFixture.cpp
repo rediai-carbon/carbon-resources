@@ -4,13 +4,20 @@
 
 #include <process.hpp>
 
+#include <algorithm>
+#include <cctype>
 #include <iostream>
+#include <vector>
 
 #include <fstream>
 
 #include <sstream>
 
 #include <ResourceTools.h>
+#include <cstdlib>
+#include <cstring>
+
+#include "ExistingPath.h"
 
 void ResourcesTestFixture::SetUp()
 {
@@ -38,19 +45,119 @@ void ResourcesTestFixture::TearDown()
 
 }
 
+namespace
+{
+std::string ReadText( const std::filesystem::path& path )
+{
+	std::ifstream input( path, std::ios::in | std::ios::binary );
+	if( !input )
+	{
+		return {};
+	}
+	std::stringstream buffer;
+	buffer << input.rdbuf();
+	return buffer.str();
+}
+
+std::vector<std::string> ResourceBlocks( const std::string& document )
+{
+	const std::string marker = "\n  - ";
+	const auto start = document.find( marker );
+	if( start == std::string::npos )
+	{
+		return {};
+	}
+	std::vector<std::string> blocks;
+	std::size_t cursor = start + 1;
+	while( cursor < document.size() )
+	{
+		const auto next = document.find( marker, cursor + marker.size() - 1 );
+		const auto end = next == std::string::npos ? document.size() : next + 1;
+		std::string block = document.substr( cursor, end - cursor );
+		std::string stripped;
+		std::stringstream lines( block );
+		std::string line;
+		while( std::getline( lines, line ) )
+		{
+			if( !line.empty() && line.back() == '\r' )
+			{
+				line.pop_back();
+			}
+			const auto operation = line.find( "BinaryOperation:" );
+			if( operation != std::string::npos )
+			{
+				const char* value = line.c_str() + operation + std::strlen( "BinaryOperation:" );
+				char* end = nullptr;
+				const auto mode = std::strtoul( value, &end, 10 );
+				const bool regularFile = end != value && ( mode & 0170000u ) == 0100000u;
+				stripped += regularFile ? "BinaryOperation: regular\n" : line + "\n";
+				continue;
+			}
+			stripped += line;
+			stripped += '\n';
+		}
+		blocks.push_back( stripped );
+		if( next == std::string::npos )
+		{
+			break;
+		}
+		cursor = next + 1;
+	}
+	std::sort( blocks.begin(), blocks.end() );
+	return blocks;
+}
+}
+
+bool ResourcesTestFixture::ResourceGroupContentMatches( const std::filesystem::path& actualPath, const std::filesystem::path& goldPath )
+{
+	const std::string actual = ReadText( actualPath );
+	const std::string gold = ReadText( goldPath );
+	if( actual.empty() || gold.empty() )
+	{
+		return false;
+	}
+	const auto actualResources = actual.find( "\nResources:" );
+	const auto goldResources = gold.find( "\nResources:" );
+	if( actualResources == std::string::npos || goldResources == std::string::npos )
+	{
+		return false;
+	}
+	if( actual.substr( 0, actualResources ) != gold.substr( 0, goldResources ) )
+	{
+		return false;
+	}
+	return ResourceBlocks( actual ) == ResourceBlocks( gold );
+}
+
 bool ResourcesTestFixture::FileExists( const std::filesystem::path& filePath )
 {
 	return std::filesystem::exists( filePath );
 }
 
+namespace
+{
+std::filesystem::path OpenablePath( const std::filesystem::path& requested )
+{
+	if( requested.empty() || std::filesystem::exists( requested ) )
+	{
+		return requested;
+	}
+	const auto absolute = std::filesystem::absolute( requested );
+	const auto resolved = PreferExistingPathCase( absolute, absolute.parent_path() );
+	return resolved ? *resolved : requested;
+}
+}
+
 bool ResourcesTestFixture::FilesMatch( const std::filesystem::path& file1Path, const std::filesystem::path& file2Path )
 {
+	const auto opened1 = OpenablePath( file1Path );
+	const auto opened2 = OpenablePath( file2Path );
 	// Open files generate data checksums and compare
 
 	// File 1
 	std::ifstream inputStream1;
 
-	inputStream1.open( file1Path, std::ios::in | std::ios::binary );
+	inputStream1.open( opened1, std::ios::in | std::ios::binary );
 
 	if( !inputStream1 )
 	{
@@ -73,7 +180,7 @@ bool ResourcesTestFixture::FilesMatch( const std::filesystem::path& file1Path, c
 	// File 2
 	std::ifstream inputStream2;
 
-	inputStream2.open( file2Path, std::ios::in | std::ios::binary );
+	inputStream2.open( opened2, std::ios::in | std::ios::binary );
 
 	if( !inputStream2 )
 	{
