@@ -82,7 +82,8 @@ struct ResourcesTestFixture : public ::testing::Test
 
 	bool FilesMatch( const std::filesystem::path& file1Path, const std::filesystem::path& file2Path );
 
-	// Same resource records as a platform gold file. Directory order and BinaryOperation differ by filesystem.
+	// Same resource records as a platform gold file. Directory order is not significant.
+	// Regular-file BinaryOperation values are normalized; other modes are compared.
 	bool ResourceGroupContentMatches( const std::filesystem::path& actualPath, const std::filesystem::path& goldPath );
 
 	bool DirectoryIsSubset( const std::filesystem::path& dir1, const std::filesystem::path& dir2 ); // Test that all files in dir1 exist in dir2, and the contents of the files in both directories are the same.

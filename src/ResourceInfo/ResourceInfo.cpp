@@ -262,7 +262,12 @@ Result ResourceInfo::GetDestinationPath( const ResourceDestinationSettings& dest
 		return Result{ ResultType::FAIL };
 	}
 
-	path = PreferExistingPathCase( path );
+	const auto resolved = PreferExistingPathCase( path, destinationSettings.basePath );
+	if( !resolved )
+	{
+		return Result{ ResultType::FAIL };
+	}
+	path = *resolved;
 
 	return Result{ ResultType::SUCCESS };
 }

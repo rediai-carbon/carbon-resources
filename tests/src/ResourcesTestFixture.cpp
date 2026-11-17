@@ -14,6 +14,10 @@
 #include <sstream>
 
 #include <ResourceTools.h>
+#include <cstdlib>
+#include <cstring>
+
+#include "ExistingPath.h"
 
 void ResourcesTestFixture::SetUp()
 {
@@ -75,13 +79,19 @@ std::vector<std::string> ResourceBlocks( const std::string& document )
 		std::string line;
 		while( std::getline( lines, line ) )
 		{
-			if( line.find( "BinaryOperation:" ) != std::string::npos )
-			{
-				continue;
-			}
 			if( !line.empty() && line.back() == '\r' )
 			{
 				line.pop_back();
+			}
+			const auto operation = line.find( "BinaryOperation:" );
+			if( operation != std::string::npos )
+			{
+				const char* value = line.c_str() + operation + std::strlen( "BinaryOperation:" );
+				char* end = nullptr;
+				const auto mode = std::strtoul( value, &end, 10 );
+				const bool regularFile = end != value && ( mode & 0170000u ) == 0100000u;
+				stripped += regularFile ? "BinaryOperation: regular\n" : line + "\n";
+				continue;
 			}
 			stripped += line;
 			stripped += '\n';
@@ -126,50 +136,17 @@ bool ResourcesTestFixture::FileExists( const std::filesystem::path& filePath )
 
 namespace
 {
-std::filesystem::path MatchExistingCase( const std::filesystem::path& requested )
+std::filesystem::path OpenablePath( const std::filesystem::path& requested )
 {
-	if( requested.empty() || std::filesystem::exists( requested ) )
-	{
-		return requested;
-	}
-	std::filesystem::path resolved;
-	for( const auto& part : requested )
-	{
-		const std::filesystem::path next = resolved.empty() ? std::filesystem::path( part ) : resolved / part;
-		if( std::filesystem::exists( next ) )
-		{
-			resolved = next;
-			continue;
-		}
-		if( resolved.empty() || !std::filesystem::is_directory( resolved ) )
-		{
-			return requested;
-		}
-		bool found = false;
-		for( const auto& entry : std::filesystem::directory_iterator( resolved ) )
-		{
-			const auto have = entry.path().filename().string();
-			const auto want = part.string();
-			if( have.size() == want.size() && std::equal( have.begin(), have.end(), want.begin(), []( unsigned char a, unsigned char b ) { return std::tolower( a ) == std::tolower( b ); } ) )
-			{
-				resolved = entry.path();
-				found = true;
-				break;
-			}
-		}
-		if( !found )
-		{
-			return requested;
-		}
-	}
-	return resolved;
+	const auto resolved = PreferExistingPathCase( requested, requested.parent_path() );
+	return resolved ? *resolved : requested;
 }
 }
 
 bool ResourcesTestFixture::FilesMatch( const std::filesystem::path& file1Path, const std::filesystem::path& file2Path )
 {
-	const auto opened1 = MatchExistingCase( file1Path );
-	const auto opened2 = MatchExistingCase( file2Path );
+	const auto opened1 = OpenablePath( file1Path );
+	const auto opened2 = OpenablePath( file2Path );
 	// Open files generate data checksums and compare
 
 	// File 1

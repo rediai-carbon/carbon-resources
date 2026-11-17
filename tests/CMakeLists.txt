@@ -7,6 +7,7 @@ find_package(tiny-process-library CONFIG REQUIRED)
 include(GoogleTest)
 
 set(SRC_FILES
+        src/PathResolutionTest.cpp
         src/ResourcesTestFixture.cpp
         src/ResourcesTestFixture.h
         src/ResourcesLibraryTest.cpp
@@ -37,7 +38,7 @@ endif()
 
 target_include_directories(resources-test PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
 
-target_include_directories(resources-test PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(resources-test PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(resources-test PRIVATE GTest::gtest GTest::gtest_main tiny-process-library::tiny-process-library resources resources-tools)
 
